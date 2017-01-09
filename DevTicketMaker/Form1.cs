@@ -20,10 +20,13 @@ namespace DevTicketMaker {
         public static extern uint BuildCetk(string fileOut, byte[] tikData, byte[] sig, byte[] chainSig);
         
 
-        private void sanitizeInput() {
+        private bool sanitizeInput() {
+            bool b = true;
             if (Int32.Parse(verInput.Text) > 65535) verInput.Text = 65535.ToString();
             tidInput.Text = Regex.Replace(tidInput.Text, @"\s+", "");
             keyInput.Text = Regex.Replace(keyInput.Text, @"\s+", "");
+            if (tidInput.Text.Length < 8 || keyInput.Text.Length < 32) b = false;
+            return b;
         }
 
         private static byte[] StringToByteArray(string hex) {
@@ -47,8 +50,11 @@ namespace DevTicketMaker {
         }
 
         private void genButton_Click(object sender, EventArgs e) {
-            //Sanitize
-            sanitizeInput();
+            //Checks and sanitize
+            if (!sanitizeInput()) {
+                MessageBox.Show("Bad user input!");
+                return;
+            }
 
             //Get given info
             byte[] tid = StringToByteArray(tidInput.Text);
